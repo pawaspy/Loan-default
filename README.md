@@ -18,6 +18,9 @@ Ensure you have Python 3.x installed in your environment. You'll also need the f
 - matplotlib
 - seaborn
 
+- ### Dataset :
+ Dataset can be downloaded from the kaggle official site : `https://www.kaggle.com/datasets/wordsforthewise/lending-club`
+
 ### Installation
 
 Clone the repo:
