@@ -16,17 +16,20 @@ data = data.dropna(subset=['loan_status'])
 
 # Fill missing values with mean or mode
 for column in data.columns:
-    if data[column].dtype == np.number:
+    if np.issubdtype(data[column].dtype, np.number):
         data[column].fillna(data[column].mean(), inplace=True)
     else:
         data[column].fillna(data[column].mode()[0], inplace=True)
 
+# Convert target variable into numerical if it's categorical
+if data['loan_status'].dtype == 'object':
+    data['loan_status'] = pd.Categorical(data['loan_status']).codes
+
 # Convert categorical data into numerical
-data = pd.get_dummies(data)
+X = pd.get_dummies(data.drop('loan_status', axis=1))
+y = data['loan_status']
 
 # Data splitting
-X = data.drop('loan_status', axis=1)
-y = data['loan_status']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Data scaling
@@ -65,3 +68,11 @@ param_grid = {
 
 grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5)
 grid_search.fit(X_train, y_train)
+
+# Use the best estimator to make predictions
+rf_best = grid_search.best_estimator_
+y_pred_rf_best = rf_best.predict(X_test)
+
+print("Random Forest after tuning:")
+print(confusion_matrix(y_test, y_pred_rf_best))
+print(classification_report(y_test, y_pred_rf_best))
